@@ -17,6 +17,36 @@
     />
   </head>
   <body>
+    <h2 class="header-title">
+      <i class="fas fa-clipboard-check"></i> Lina's To-do List
+    </h2>
+    <div class="wrapper">
+      <div class="task-input">
+        <input type="text" placeholder="Add a new task" />
+      </div>
+      <div class="task-input" id="dateContainer">
+        <input
+          type="date"
+          placeholder="Due Date"
+          id="dueDate"
+          aria-label="Due Date"
+        />
+        <div class="add-controls">
+          <div class="filters">
+            <button id="add-btn" class="add-btn" type="button">Add</button>
+          </div>
+        </div>
+      </div>
+      <div class="controls">
+        <div class="filters">
+          <span class="active" id="all">All</span>
+          <span id="pending">Pending</span>
+          <span id="completed">Completed</span>
+        </div>
+        <button class="clear-btn">Clear All</button>
+      </div>
+      <ul class="task-box"></ul>
+    </div>
 
     <script src="js/script.js"></script>
   </body>
