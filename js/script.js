@@ -80,4 +80,18 @@ function showTodo(filter) {
     taskInput.focus();
     taskInput.classList.add("active");
   }
+
+  function deleteTask(deleteId, filter) {
+    isEditTask = false;
+    todos.splice(deleteId, 1);
+    localStorage.setItem("todo-list", JSON.stringify(todos));
+    showTodo(filter);
+  }
+  
+  clearAll.addEventListener("click", () => {
+    isEditTask = false;
+    todos.splice(0, todos.length);
+    localStorage.setItem("todo-list", JSON.stringify(todos));
+    showTodo();
+  });
   
