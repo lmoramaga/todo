@@ -17,13 +17,29 @@ filters.forEach((btn) => {
   });
 });
 
+const doSort = (items) => {
+  if (items) {
+    return items.sort((a, b) => {
+      if (a.name.toLowerCase() > b.name.toLowerCase()) {
+        return 1;
+      }
+      if (a.name.toLowerCase() < b.name.toLowerCase()) {
+        return -1;
+      }
+      return 0;
+    });
+  }
+};
+
+doSort(todos);
+
 function showTodo(filter) {
-    let liTag = "";
-    if (todos) {
-      todos.forEach((todo, id) => {
-        const completed = todo.status === "completed" ? "checked" : "";
-        if (filter === todo.status || filter === "all") {
-          liTag += `<li class="task">
+  let liTag = "";
+  if (todos) {
+    todos.forEach((todo, id) => {
+      const completed = todo.status === "completed" ? "checked" : "";
+      if (filter === todo.status || filter === "all") {
+        liTag += `<li class="task">
                               <label for="${id}">
                                   <input onclick="updateStatus(this)" type="checkbox" id="${id}" ${completed}>
                                   <div class="tasks"><p class="${completed}">${todo.name}<p class="dueDate">Due: ${todo.dueDate}</p></p></div>
@@ -37,61 +53,84 @@ function showTodo(filter) {
                                   </ul>
                               </div>
                           </li>`;
-        }
-      });
-    }
-    taskBox.innerHTML = liTag || `<span>You don't have any task here</span>`;
-    const checkTask = taskBox.querySelectorAll(".task");
-    !checkTask.length
-      ? clearAll.classList.remove("active")
-      : clearAll.classList.add("active");
-    taskBox.offsetHeight >= 300
-      ? taskBox.classList.add("overflow")
-      : taskBox.classList.remove("overflow");
-  }
-  showTodo("all");
-
-  function showMenu(selectedTask) {
-    const menuDiv = selectedTask.parentElement.lastElementChild;
-    menuDiv.classList.add("show");
-    document.addEventListener("click", (e) => {
-      if (e.target.tagName !== "I" || e.target !== selectedTask) {
-        menuDiv.classList.remove("show");
       }
     });
   }
+  taskBox.innerHTML = liTag || `<span>You don't have any task here</span>`;
+  const checkTask = taskBox.querySelectorAll(".task");
+  !checkTask.length
+    ? clearAll.classList.remove("active")
+    : clearAll.classList.add("active");
+  taskBox.offsetHeight >= 300
+    ? taskBox.classList.add("overflow")
+    : taskBox.classList.remove("overflow");
+}
+showTodo("all");
 
-  function updateStatus(selectedTask) {
-    const taskName = selectedTask.parentElement.lastElementChild;
-    if (selectedTask.checked) {
-      taskName.classList.add("checked");
-      todos[selectedTask.id].status = "completed";
-    } else {
-      taskName.classList.remove("checked");
-      todos[selectedTask.id].status = "pending";
+function showMenu(selectedTask) {
+  const menuDiv = selectedTask.parentElement.lastElementChild;
+  menuDiv.classList.add("show");
+  document.addEventListener("click", (e) => {
+    if (e.target.tagName !== "I" || e.target !== selectedTask) {
+      menuDiv.classList.remove("show");
     }
-    localStorage.setItem("todo-list", JSON.stringify(todos));
-  }
-
-  function editTask(taskId, textName) {
-    editId = taskId;
-    isEditTask = true;
-    taskInput.value = textName;
-    taskInput.focus();
-    taskInput.classList.add("active");
-  }
-
-  function deleteTask(deleteId, filter) {
-    isEditTask = false;
-    todos.splice(deleteId, 1);
-    localStorage.setItem("todo-list", JSON.stringify(todos));
-    showTodo(filter);
-  }
-  
-  clearAll.addEventListener("click", () => {
-    isEditTask = false;
-    todos.splice(0, todos.length);
-    localStorage.setItem("todo-list", JSON.stringify(todos));
-    showTodo();
   });
-  
+}
+
+function updateStatus(selectedTask) {
+  const taskName = selectedTask.parentElement.lastElementChild;
+  if (selectedTask.checked) {
+    taskName.classList.add("checked");
+    todos[selectedTask.id].status = "completed";
+  } else {
+    taskName.classList.remove("checked");
+    todos[selectedTask.id].status = "pending";
+  }
+  localStorage.setItem("todo-list", JSON.stringify(todos));
+}
+
+function editTask(taskId, textName) {
+  editId = taskId;
+  isEditTask = true;
+  taskInput.value = textName;
+  taskInput.focus();
+  taskInput.classList.add("active");
+}
+
+function deleteTask(deleteId, filter) {
+  isEditTask = false;
+  todos.splice(deleteId, 1);
+  localStorage.setItem("todo-list", JSON.stringify(todos));
+  showTodo(filter);
+}
+
+clearAll.addEventListener("click", () => {
+  isEditTask = false;
+  todos.splice(0, todos.length);
+  localStorage.setItem("todo-list", JSON.stringify(todos));
+  showTodo();
+});
+
+addBtn.addEventListener("click", () => {
+  const userTask = taskInput.value.trim();
+  if (userTask && dateInput.value) {
+    if (!isEditTask) {
+      todos = !todos ? [] : todos;
+      const taskInfo = {
+        name: userTask,
+        status: "pending",
+        dueDate: dateInput.value,
+      };
+      todos.push(taskInfo);
+    } else {
+      isEditTask = false;
+      todos[editId].name = userTask;
+      todos[editId].dueDate = dateInput.value;
+    }
+    taskInput.value = "";
+    localStorage.setItem("todo-list", JSON.stringify(doSort(todos)));
+    showTodo(document.querySelector("span.active").id);
+  } else {
+    alert("Please enter text and choose due date to add...");
+  }
+});
